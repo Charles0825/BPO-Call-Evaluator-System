@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="style.css" />
+    <title>BPO Call Evaluator - Login</title>
+  </head>
+  <body>
+    <div class="container">
+      <div class="row">
+        <div class="col">
+          <div class="image-container"></div>
+        </div>
+        <div class="col">
+          <h1>Login to System</h1>
+          <form action="/login" method="post">
+            <input
+              name="username"
+              type="text"
+              placeholder="Username"
+              required
+            />
+            <input
+              name="password"
+              type="password"
+              placeholder="Password"
+              required
+            />
+            <span><a href="/forgot">Forgot password?</a></span>
+            <button type="submit">Login</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
