@@ -105,31 +105,40 @@ app.post("/forgot-password", async (req, res) => {
   }
 });
 
-app.post("/login", async (req, res) => {
+app.post("/login", (req, res) => {
   const { username, password } = req.body;
   const hashedPassword = sha256(password);
-  console.log(hashedPassword);
+
   try {
-    const db = await connectToDatabase();
-    const usersCollection = db.collection("accounts");
+    // Check if the username and hashed password match in the database
+    const sql = "SELECT * FROM accounts WHERE username = ? AND password = ?";
+    connection.query(sql, [username, hashedPassword], (err, results) => {
+      if (err) {
+        console.error("Error executing MySQL query:", err);
+        res
+          .status(500)
+          .send(
+            '<script>alert("Internal server error"); window.location.href = "/";</script>'
+          );
+        return;
+      }
 
-    const user = await usersCollection.findOne({
-      username,
-      password: hashedPassword,
+      if (results.length === 0) {
+        res.send(
+          '<script>alert("Invalid username or password"); window.location.href = "/";</script>'
+        );
+      } else {
+        req.session.username = username;
+        res.redirect("/dashboard");
+      }
     });
-
-    if (user) {
-      loggedInUsers.push(username);
-      req.session.username = username;
-      res.redirect("/dashboard");
-    } else {
-      res.send(
-        '<script>alert("Invalid username or password"); window.location.href = "/";</script>'
-      );
-    }
   } catch (error) {
-    console.error("Error logging in:", error);
-    res.status(500).json({ error: "Internal server error" });
+    console.error("Error during login:", error);
+    res
+      .status(500)
+      .send(
+        '<script>alert("Internal server error"); window.location.href = "/";</script>'
+      );
   }
 });
 
