@@ -20,6 +20,23 @@ app.use(
   })
 );
 
+const mysql = require("mysql");
+
+const connection = mysql.createConnection({
+  host: "localhost",
+  user: "root",
+  password: "",
+  database: "system-database",
+});
+
+connection.connect((err) => {
+  if (err) {
+    console.error("Error connecting to MySQL:", err);
+    return;
+  }
+  console.log("Connected to MySQL");
+});
+
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
@@ -110,8 +127,7 @@ app.post("/login", (req, res) => {
   const hashedPassword = sha256(password);
 
   try {
-    // Check if the username and hashed password match in the database
-    const sql = "SELECT * FROM accounts WHERE username = ? AND password = ?";
+    const sql = "SELECT * FROM users WHERE username = ? AND password = ?";
     connection.query(sql, [username, hashedPassword], (err, results) => {
       if (err) {
         console.error("Error executing MySQL query:", err);
@@ -128,8 +144,10 @@ app.post("/login", (req, res) => {
           '<script>alert("Invalid username or password"); window.location.href = "/";</script>'
         );
       } else {
+        loggedInUsers.push(username);
         req.session.username = username;
         res.redirect("/dashboard");
+        console.log("Here");
       }
     });
   } catch (error) {
